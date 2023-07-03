@@ -1,6 +1,6 @@
 import numpy as np
 
-dataset = np.array([
+linear_dataset = np.array([
     { "data": [2, 3], "label": -1 },
     { "data": [4, 3], "label": -1 },
     { "data": [4, 4], "label": -1 },
@@ -13,5 +13,7 @@ dataset = np.array([
     { "data": [3.5, 5.5], "label": 1 },
 ])
 
-inputs = np.array([d["data"] for d in dataset])
-outputs = np.array([d["label"] for d in dataset])
+def get_linear_data():
+    inputs = np.array([d["data"] for d in linear_dataset])
+    outputs = np.array([d["label"] for d in linear_dataset])
+    return inputs, outputs

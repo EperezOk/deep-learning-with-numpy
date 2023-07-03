@@ -1,6 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
 
 from utils.optimizers import Momentum
 from utils.activations import sigmoid
@@ -17,11 +15,20 @@ class Perceptron:
         self.lr = lr
         self.activation = activation
         self.weights = np.zeros(M + 1) # + 1 for bias
-        self.history = []
         self.optimizer = Momentum(self.weights.shape)
+        self.weight_history = []
+        self.predic_history = []
 
 
-    def fit(self, inputs: np.array, outputs: np.array, epochs = 1000):
+    def fit(
+        self,
+        inputs: np.array,
+        outputs: np.array,
+        epochs = 300,
+        tolerance=1e-3,
+        save_w_history = False,
+        save_p_history = False
+    ):
         """
         Trains the perceptron to fit the `inputs` to the `outputs`.
         @param inputs: (N, M)
@@ -33,7 +40,7 @@ class Perceptron:
             predictions = self.predict(inputs)
 
             loss = mse(outputs, predictions)
-            if (loss == 0): break # early stopping
+            if (loss <= tolerance): break # early stopping
 
             errors = outputs - predictions
             errors = errors.reshape(-1, 1) # reshape to multiply each row as a scalar w/inputs
@@ -44,10 +51,12 @@ class Perceptron:
 
             self.weights += dw
 
-            if (epoch % 5 == 0): self.history.append(self.weights.copy())
+            if (epoch % 5 == 0 and save_w_history): self.weight_history.append(self.weights.copy())
+            if (epoch % 2 == 0 and save_p_history): self.predic_history.append(predictions.copy())
             if (epoch % 10 == 0): print(f"{epoch=} ; {loss=}")
         
-        self.history.append(self.weights.copy())
+        self.weight_history.append(self.weights.copy())
+        self.predic_history.append(predictions.copy())
         print(f"{epoch=} ; {loss=}")
 
 
@@ -60,58 +69,3 @@ class Perceptron:
         _inputs = np.insert(inputs, 0, 1, axis=1) # bias at the start of each input
         H = _inputs @ self.weights # (N, 1)
         return self.activation(H)
-    
-
-    def plot_hyperplane(self, inputs = [], labels = []):
-        colors = np.array(["blue" if o == -1 else "red" for o in labels])
-
-        plt.scatter(inputs[:, 0], inputs[:, 1], color=colors)
-
-        x = np.linspace(0, 6, 20)
-        hyperplane = -(self.weights[0] + self.weights[1] * x) / self.weights[2]
-
-        plt.plot(x, hyperplane, "g")
-
-        plt.xlim(0, 6)
-        plt.ylim(0, 6)
-        plt.grid()
-        plt.savefig("out/step_perceptron.png")
-        plt.close()
-
-
-    def plot_history(self, inputs = [], labels = []):
-        """
-        Plots the update of the weights over the epochs.
-        """
-        fig, ax = plt.subplots()
-
-        def update(i):
-            ax.clear()
-
-            weights = self.history[i]
-
-            # Plot the training data
-            plt.scatter(
-                x=inputs[:, 0],
-                y=inputs[:, 1],
-                color=np.where(labels == 1, "r", "b"),
-            )
-
-            xmax, ymax = np.max(inputs[:, 0]), np.max(inputs[:, 1])
-            x = np.linspace(0, xmax + 10, 100)
-
-            # w0 + w1*x + w2*y = 0 => y = -(w1*x + w0) / w2
-            y = -(weights[1] * x + weights[0]) / weights[2]
-
-            # Plot the separating hyperplane
-            ax.plot(x, y, c="g")
-
-            ax.set_xlim([0, xmax+2])
-            ax.set_ylim([0, ymax+2])
-            ax.set_title(f"Epoch {i*5}")
-            ax.grid()
-
-        anim = FuncAnimation(fig, update, frames=len(self.history), interval=500)
-
-        anim.save("out/step_perceptron.gif")
-        fig.clf()
