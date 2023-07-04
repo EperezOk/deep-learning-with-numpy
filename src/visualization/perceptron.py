@@ -4,7 +4,7 @@ from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 from matplotlib.animation import FuncAnimation
 
-def plot_weight_history(inputs, labels, weight_history):
+def plot_weight_history(inputs, labels, weight_history, xlim=[0, 6], ylim=[0, 7]):
     """
     Plots the update of the weights over the epochs.
     """
@@ -22,8 +22,7 @@ def plot_weight_history(inputs, labels, weight_history):
             color=np.where(labels == 1, "r", "b"),
         )
 
-        xmax, ymax = np.max(inputs[:, 0]), np.max(inputs[:, 1])
-        x = np.linspace(0, xmax + 10, 100)
+        x = np.linspace(xlim[0], xlim[1], 100)
 
         # w0 + w1*x + w2*y = 0 => y = -(w1*x + w0) / w2
         y = -(weights[1] * x + weights[0]) / weights[2]
@@ -38,8 +37,8 @@ def plot_weight_history(inputs, labels, weight_history):
         ]
 
         ax.legend(handles=legend_elements, loc="lower right")
-        ax.set_xlim([0, xmax+2])
-        ax.set_ylim([0, ymax+2])
+        ax.set_xlim(xlim)
+        ax.set_ylim(ylim)
         ax.set_title(f"Epoch {i*5}")
 
     anim = FuncAnimation(fig, update, frames=len(weight_history), interval=500)
@@ -50,7 +49,7 @@ def plot_weight_history(inputs, labels, weight_history):
     fig.clf()
 
 
-def plot_predict_history(inputs, predic_history, outputs):
+def plot_predict_history(inputs, predic_history, outputs, ylim=[-10, 20], interval=1):
     """
     Plots the predictions for the `inputs` over the epochs.
     """
@@ -67,9 +66,9 @@ def plot_predict_history(inputs, predic_history, outputs):
         # Plot the predictions
         plt.plot(inputs, predictions, "r", marker="o", markersize=3, label="Predictions")
 
-        ax.set_title(f"Epoch {i}")
+        ax.set_title(f"Epoch {i*interval}")
         ax.legend()
-        ax.set_ylim([-10, 20])
+        ax.set_ylim(ylim)
 
     anim = FuncAnimation(fig, update, frames=len(predic_history), interval=300)
 

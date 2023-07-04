@@ -23,14 +23,16 @@ class Perceptron:
         inputs: np.array,
         outputs: np.array,
         epochs = 300,
-        tolerance=1e-3,
-        save_w_history = False,
-        save_p_history = False
+        tolerance = 1e-3,
+        threshold_predictions = lambda P: P,
     ) -> tuple[list[np.array], list[np.array]]:
         """
         Trains the perceptron to fit the `inputs` to the `outputs`.
         @param inputs: (N, M)
         @param outputs: (N, 1)
+        @param epochs: max amount of epochs to train.
+        @param tolerance: min loss to stop training.
+        @param threshold_predictions: callable that thresholds the predictions.
         @return1 weight_history: list of weights for each epoch.
         @return2 predict_history: list of predictions for each epoch.
         """
@@ -41,6 +43,7 @@ class Perceptron:
 
         for epoch in range(epochs):
             predictions, H = self.predict(inputs)
+            predictions = threshold_predictions(predictions)
 
             loss = mse(outputs, predictions)
             if (loss <= tolerance): break # early stopping
@@ -55,8 +58,9 @@ class Perceptron:
 
             self.weights += dw
 
-            if (epoch % 5 == 0 and save_w_history): weight_history.append(self.weights.copy())
-            if (save_p_history): predict_history.append(predictions.copy())
+            if (epoch % 5 == 0): weight_history.append(self.weights.copy())
+            predict_history.append(predictions.copy())
+
             if (epoch % 10 == 0): print(f"{epoch=} ; {loss=}")
         
         weight_history.append(self.weights.copy())

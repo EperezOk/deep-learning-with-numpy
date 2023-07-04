@@ -16,3 +16,31 @@ def get_linear_data():
     y = slope * x + intercept + noise
 
     return x.reshape(-1, 1), y
+
+
+def get_quadratic_data():
+    np.random.seed(42)
+
+    num_points = 50
+
+    x = np.linspace(-5, 5, num_points)
+
+    intercept = 2
+    noise = np.random.normal(0, 1, num_points)
+    y = x**2 + intercept + noise
+
+    return x.reshape(-1, 1), y
+
+
+def get_exponential_data():
+    np.random.seed(42)
+
+    num_points = 50
+
+    x = np.linspace(-5, 5, num_points)
+
+    intercept = -2
+    noise = np.random.normal(0, 2, num_points)
+    y = np.exp(x) + intercept + noise
+
+    return x.reshape(-1, 1), y
