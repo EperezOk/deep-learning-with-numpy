@@ -6,6 +6,8 @@ import visualization.perceptron as p_viz
 def main():
     # step_perceptron()
     linear_perceptron()
+    # TODO: non-linear perceptron for classification, see if the weights represent a hyperplane as it happens on the step perceptron
+    # TODO: non-linear perceptron for non-linear regression
 
 
 def step_perceptron():
@@ -13,10 +15,9 @@ def step_perceptron():
 
     perceptron = Perceptron(M=2, activation=step)
 
-    perceptron.fit(inputs, outputs, tolerance=0, save_w_history=True)
+    weight_history, _ = perceptron.fit(inputs, outputs, tolerance=0, save_w_history=True)
 
-    p_viz.plot_weight_history(inputs, outputs, perceptron.weight_history)
-    p_viz.plot_hyperplane(inputs, outputs, perceptron.weights)
+    p_viz.plot_weight_history(inputs, outputs, weight_history)
 
     # Show how XOR is not linearly separable
 
@@ -26,11 +27,11 @@ def linear_perceptron():
 
     perceptron = Perceptron(M=1, lr=0.001, activation=linear)
 
-    perceptron.fit(inputs, outputs, tolerance=0.83, save_p_history=True)
+    _, predict_history = perceptron.fit(inputs, outputs, tolerance=0.83, save_p_history=True)
 
-    p_viz.plot_predic_history(
+    p_viz.plot_predict_history(
         inputs.reshape(1,-1)[0],
-        [p.reshape(1,-1)[0] for p in perceptron.predic_history],
+        [p.reshape(1,-1)[0] for p in predict_history],
         outputs,
     )
 

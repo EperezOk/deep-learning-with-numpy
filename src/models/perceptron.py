@@ -16,8 +16,6 @@ class Perceptron:
         self.activation = activation
         self.weights = np.zeros(M + 1) # + 1 for bias
         self.optimizer = Momentum(self.weights.shape)
-        self.weight_history = []
-        self.predic_history = []
 
 
     def fit(
@@ -28,44 +26,53 @@ class Perceptron:
         tolerance=1e-3,
         save_w_history = False,
         save_p_history = False
-    ):
+    ) -> tuple[list[np.array], list[np.array]]:
         """
         Trains the perceptron to fit the `inputs` to the `outputs`.
         @param inputs: (N, M)
         @param outputs: (N, 1)
+        @return1 weight_history: list of weights for each epoch.
+        @return2 predict_history: list of predictions for each epoch.
         """
         _inputs = np.insert(inputs, 0, 1, axis=1) # bias at the start of each input
 
+        weight_history = []
+        predict_history = []
+
         for epoch in range(epochs):
-            predictions = self.predict(inputs)
+            predictions, H = self.predict(inputs)
 
             loss = mse(outputs, predictions)
             if (loss <= tolerance): break # early stopping
 
-            errors = outputs - predictions
-            errors = errors.reshape(-1, 1) # reshape to multiply each row as a scalar w/inputs
+            # Works for step activation as well, thanks to how we defined these derivatives
+            gradients = mse.derivative(outputs, predictions) * self.activation.derivative(H)
+            gradients = gradients.reshape(-1, 1) # reshape to multiply each row as a scalar w/inputs
 
-            dw = self.lr * errors * _inputs # (N, M+1)
+            dw = -1 * self.lr * gradients * _inputs # (N, M+1)
             dw = self.optimizer.apply(dw)
             dw = np.sum(dw, axis=0) # (1, M+1), squash deltas
 
             self.weights += dw
 
-            if (epoch % 5 == 0 and save_w_history): self.weight_history.append(self.weights.copy())
-            if (epoch % 2 == 0 and save_p_history): self.predic_history.append(predictions.copy())
+            if (epoch % 5 == 0 and save_w_history): weight_history.append(self.weights.copy())
+            if (save_p_history): predict_history.append(predictions.copy())
             if (epoch % 10 == 0): print(f"{epoch=} ; {loss=}")
         
-        self.weight_history.append(self.weights.copy())
-        self.predic_history.append(predictions.copy())
+        weight_history.append(self.weights.copy())
+        predict_history.append(predictions.copy())
         print(f"{epoch=} ; {loss=}")
 
+        return weight_history, predict_history
 
-    def predict(self, inputs: np.array):
+
+    def predict(self, inputs: np.array) -> tuple[np.array, np.array]:
         """
         Makes a prediction over `inputs`.
         @param inputs: (N, M)
-        @return predictions: (N, 1)
+        @return1 predictions: (N, 1)
+        @return2 H: (N, 1), linear combination of the inputs and the weights
         """
         _inputs = np.insert(inputs, 0, 1, axis=1) # bias at the start of each input
         H = _inputs @ self.weights # (N, 1)
-        return self.activation(H)
+        return self.activation(H), H

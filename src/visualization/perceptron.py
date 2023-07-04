@@ -4,30 +4,6 @@ from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 from matplotlib.animation import FuncAnimation
 
-def plot_hyperplane(inputs, labels, weights):
-    colors = np.array(["blue" if o == -1 else "red" for o in labels])
-
-    plt.scatter(inputs[:, 0], inputs[:, 1], color=colors)
-
-    x = np.linspace(0, 6, 20)
-    hyperplane = -(weights[0] + weights[1] * x) / weights[2]
-
-    plt.plot(x, hyperplane, "g")
-
-    # Create custom handles for the legend
-    legend_elements = [
-        Patch(color="blue", label="Group A"),
-        Patch(color="red", label="Group B"),
-        Line2D([0], [0], color="green", label="Separating hyperplane")
-    ]
-
-    plt.xlim(0, 6)
-    plt.ylim(0, 6)
-    plt.legend(handles=legend_elements, loc="lower right")
-    plt.savefig("out/hyperplane.png")
-    plt.close()
-
-
 def plot_weight_history(inputs, labels, weight_history):
     """
     Plots the update of the weights over the epochs.
@@ -69,10 +45,12 @@ def plot_weight_history(inputs, labels, weight_history):
     anim = FuncAnimation(fig, update, frames=len(weight_history), interval=500)
 
     anim.save("out/weight_history.gif")
+    fig.savefig("out/separating_hyperplane.png") # save the last frame
+
     fig.clf()
 
 
-def plot_predic_history(inputs, predic_history, outputs):
+def plot_predict_history(inputs, predic_history, outputs):
     """
     Plots the predictions for the `inputs` over the epochs.
     """
@@ -91,8 +69,11 @@ def plot_predic_history(inputs, predic_history, outputs):
 
         ax.set_title(f"Epoch {i}")
         ax.legend()
+        ax.set_ylim([-10, 20])
 
-    anim = FuncAnimation(fig, update, frames=len(predic_history), interval=200)
+    anim = FuncAnimation(fig, update, frames=len(predic_history), interval=300)
 
-    anim.save("out/predic_history.gif")
+    anim.save("out/predict_history.gif")
+    fig.savefig("out/regression.png") # save the last frame
+
     fig.clf()
