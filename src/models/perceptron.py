@@ -53,7 +53,7 @@ class Perceptron:
             gradients = gradients.reshape(-1, 1) # reshape to multiply each row as a scalar w/inputs
 
             dw = -1 * self.lr * gradients * _inputs # (N, M+1)
-            dw = self.optimizer.apply(dw)
+            dw = self.optimizer(dw)
             dw = np.sum(dw, axis=0) # (1, M+1), squash deltas
 
             self.weights += dw

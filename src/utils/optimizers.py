@@ -6,7 +6,7 @@ class Momentum:
         self.prev_dw = np.zeros(shape)
         self.rate = rate
 
-    def apply(self, dw: np.array):
+    def __call__(self, dw: np.array):
         _dw = dw.copy()
         dw += self.rate * self.prev_dw
         self.prev_dw = _dw
