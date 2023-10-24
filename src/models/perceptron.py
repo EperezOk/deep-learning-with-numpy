@@ -8,9 +8,14 @@ class Perceptron:
 
     def __init__(self, M: int, lr = 0.01, activation = sigmoid):
         """
-        @param M: amount of features of each input.
-        @param lr: learning rate.
-        @param activation: activation function.
+        Parameters
+        ----------
+        M : int
+            Amount of features of each input.
+        lr : float
+            Learning rate.
+        activation : str
+            Activation function.
         """
         self.lr = lr
         self.activation = activation
@@ -20,21 +25,34 @@ class Perceptron:
 
     def fit(
         self,
-        inputs: np.array,
-        outputs: np.array,
+        inputs: np.ndarray,
+        outputs: np.ndarray,
         epochs = 300,
         tolerance = 1e-3,
         threshold_predictions = lambda P: P,
-    ) -> tuple[list[np.array], list[np.array]]:
+    ) -> tuple[list[np.ndarray], list[np.ndarray]]:
         """
         Trains the perceptron to fit the `inputs` to the `outputs`.
-        @param inputs: (N, M)
-        @param outputs: (N, 1)
-        @param epochs: max amount of epochs to train.
-        @param tolerance: min loss to stop training.
-        @param threshold_predictions: callable that thresholds the predictions.
-        @return1 weight_history: list of weights for each epoch.
-        @return2 predict_history: list of predictions for each epoch.
+
+        Parameters
+        ----------
+        inputs : numpy.ndarray
+            Input data of shape (N, M).
+        outputs : numpy.ndarray
+            Target outputs of shape (N, 1).
+        epochs : int
+            Maximum number of epochs to train.
+        tolerance : float
+            Minimum loss value to stop training.
+        threshold_predictions : callable
+            A function that thresholds the predictions.
+
+        Returns
+        -------
+        weight_history : list
+            A list of weights for each epoch.
+        predict_history : list
+            A list of predictions for each epoch.
         """
         _inputs = np.insert(inputs, 0, 1, axis=1) # bias at the start of each input
 
@@ -70,12 +88,21 @@ class Perceptron:
         return weight_history, predict_history
 
 
-    def predict(self, inputs: np.array) -> tuple[np.array, np.array]:
+    def predict(self, inputs: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         """
         Makes a prediction over `inputs`.
-        @param inputs: (N, M)
-        @return1 predictions: (N, 1)
-        @return2 H: (N, 1), linear combination of the inputs and the weights
+
+        Parameters
+        ----------
+        inputs : numpy.ndarray
+            Input data of shape (N, M).
+
+        Returns
+        -------
+        predictions : numpy.ndarray
+            Predicted outputs of shape (N, 1).
+        H : numpy.ndarray
+            Linear combination of the inputs and the weights, with shape (N, 1).
         """
         _inputs = np.insert(inputs, 0, 1, axis=1) # bias at the start of each input
         H = _inputs @ self.weights # (N, 1)
