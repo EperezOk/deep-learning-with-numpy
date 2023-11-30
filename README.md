@@ -1,8 +1,12 @@
-# Deep Learning 101
+# Deep Learning With Numpy
 
-Classes:
+Implementation of Deep Learning models from scratch, using only `numpy` as a dependency.
 
-1. Perceptron.
-2. Multi-Layer Perceptron.
-3. Autoencoder.
-4. Variational Autoencoder.
+> `matplotlib` is also used for plotting.
+
+The following models are to be implemented:
+
+- [x] [Perceptron](src/models/perceptron.py).
+- [ ] Multi-Layer Perceptron.
+- [ ] Autoencoder.
+- [ ] Variational Autoencoder.
