@@ -55,3 +55,15 @@ class Sigmoid(ActivationFunction):
         return _sigmoid * (1 - _sigmoid)
 
 sigmoid = Sigmoid()
+
+class ReLU(ActivationFunction):
+    """
+    ReLU activation function.
+    """  
+    def __call__(self, X: np.ndarray):
+        return np.maximum(0, X)
+
+    def derivative(self, X: np.ndarray):
+        return np.where(X > 0, 1, 0)
+    
+relu = ReLU()

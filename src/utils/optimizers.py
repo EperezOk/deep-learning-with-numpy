@@ -2,7 +2,7 @@ import numpy as np
 
 class Momentum:
 
-    def __init__(self, shape, rate = 0.9):
+    def __init__(self, shape: tuple, rate: float = 0.9):
         self.prev_dw = np.zeros(shape)
         self.rate = rate
 
