@@ -6,9 +6,7 @@ from utils.optimizers import Momentum
 
 class MLP():
 
-    def __init__(
-        self, lr: float, layers: list[int], activation_out: ActivationFunction
-    ):
+    def __init__(self, lr: float, layers: list[int], activation_out: ActivationFunction):
         """
         Receives a list of layer sizes, including the input layer size and the output layer size.
 
@@ -34,7 +32,10 @@ class MLP():
 
             if epoch % 1000 == 0: print(f"{epoch=} ; {loss=}")
 
-            self.backpropagation(H, V, hO, loss_derivative)
+            dW = self.backpropagation(H, V, hO, loss_derivative)
+
+            # update weights, using momentum optimization
+            self.weights = [W + self.optimizers[i](dW[i]) for i, W in enumerate(self.weights)]
 
         return O
 
@@ -47,12 +48,11 @@ class MLP():
         H = []
 
         # iterate over hidden layers
-        for i, w in enumerate(self.weights[:-1]):
-            h = w @ V[i]
+        for i, W in enumerate(self.weights[:-1]):
+            h = W @ V[i]
             v = relu(h)
-            v = np.insert(v, 0, 1, axis=0) # add bias to hidden layer output
             H.append(h)
-            V.append(v)
+            V.append(np.insert(v, 0, 1, axis=0)) # add bias to hidden layer output
 
         hO = self.weights[-1] @ V[-1]
 
@@ -62,13 +62,7 @@ class MLP():
         return H, V, hO, O.T
 
 
-    def backpropagation(
-        self,
-        H: np.ndarray,
-        V: np.ndarray,
-        hO: np.ndarray,
-        loss_derivative: np.ndarray
-    ):
+    def backpropagation(self, H: np.ndarray, V: np.ndarray, hO: np.ndarray, loss_derivative: np.ndarray):
         # update output layer weights
         deltas = loss_derivative.T * self.activation_out.derivative(hO)
         dw = self.learning_rate * deltas @ V[-1].T
@@ -84,12 +78,5 @@ class MLP():
             # V[i] is the output of the (i-1)-th hidden layer, since V[0] is the input (and len(V) = len(H) + 1)
             # insert at the beginning to keep the order
             dW.insert(0, -self.learning_rate * deltas @ V[i].T)
-
-        # final gradient for input layer
-        prev_delta_sum = deltas.T @ self.weights[0][:, 1:]
-
-        # update weights, using momentum optimization
-        for i in range(len(self.weights)):
-            self.weights[i] += self.optimizers[i](dW[i])
-
-        return prev_delta_sum
+        
+        return dW
