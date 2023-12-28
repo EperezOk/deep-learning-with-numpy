@@ -25,7 +25,7 @@ class MLP():
         self.optimizers = [Momentum(weights.shape) for weights in self.weights]
 
 
-    def fit(self, X: np.ndarray, Y: np.ndarray, epochs: int = 15_000):
+    def fit(self, X: np.ndarray, Y: np.ndarray, epochs: int = 10_000):
         for epoch in range(epochs):
             H, V, hO, O = self.feed_forward(X)
 
