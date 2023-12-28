@@ -14,8 +14,10 @@ class MLP():
         """
         self.learning_rate = lr
 
-        # +1 in the column dim to account for bias term on each layer
-        self.weights = [np.random.randn(layers[i + 1], layers[i] + 1) for i in range(len(layers) - 1)]
+        # He initialization. +1 in the column dim to account for bias term on each layer.
+        self.weights = [
+            np.random.randn(layers[i+1], layers[i] + 1) * np.sqrt(2/layers[i]) for i in range(len(layers)-1)
+        ]
 
         self.activation_out = activation_out
 
@@ -23,7 +25,7 @@ class MLP():
         self.optimizers = [Momentum(weights.shape) for weights in self.weights]
 
 
-    def fit(self, X: np.ndarray, Y: np.ndarray, epochs: int = 10_000):
+    def fit(self, X: np.ndarray, Y: np.ndarray, epochs: int = 15_000):
         for epoch in range(epochs):
             H, V, hO, O = self.feed_forward(X)
 
@@ -65,7 +67,7 @@ class MLP():
     def backpropagation(self, H: np.ndarray, V: np.ndarray, hO: np.ndarray, loss_derivative: np.ndarray):
         # update output layer weights
         deltas = loss_derivative.T * self.activation_out.derivative(hO)
-        dw = self.learning_rate * deltas @ V[-1].T
+        dw = -self.learning_rate * deltas @ V[-1].T
 
         dW = [dw]
 
