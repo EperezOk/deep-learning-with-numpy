@@ -2,11 +2,11 @@
 
 Implementation of Deep Learning models from scratch, using only `numpy` as a dependency.
 
-> `matplotlib` is also used for plotting.
+> `matplotlib` and `seaborn` are also used for plotting.
 
 The following models are to be implemented:
 
 - [x] [Perceptron](src/models/perceptron.py).
-- [ ] Multi-Layer Perceptron.
+- [x] [Multi-Layer Perceptron](src/models/mlp.py).
 - [ ] Autoencoder.
 - [ ] Variational Autoencoder.
